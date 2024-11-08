@@ -20,7 +20,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4   
-      - uses: .github/workflows/deployment.yml
+      - uses: ./.github/workflows/deployment.yml
         with:
           namespace: ${{ matrix.namespace }}
           environment: ${{ matrix.environment }}
