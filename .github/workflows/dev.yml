@@ -15,10 +15,9 @@ jobs:
         environment: [dev]  # Different environments
         application: [frontend, backend, cron]  # Multiple applications
     steps:
-      - name: Call deployment workflow
-        uses: ./.github/workflows/deployment.yml
-        with:
-          namespace: ${{ matrix.namespace }}
-          environment: ${{ matrix.environment }}
-          application: ${{ matrix.application }}
-          override_config: ""  # Optional input
+      uses: ./.github/workflows/deployment.yml
+      with:
+        namespace: ${{ matrix.namespace }}
+        environment: ${{ matrix.environment }}
+        application: ${{ matrix.application }}
+        override_config: ""  # Optional input
