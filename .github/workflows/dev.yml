@@ -1,3 +1,4 @@
+# .github/workflows/dev.yml
 name: MP dev auto deploy
 
 on:
@@ -5,21 +6,19 @@ on:
     types: [opened, synchronize, reopened, labeled]
   workflow_dispatch:
 
-env:
-  KUBECTL_VERSION: '1.22.13'
-  ENVIRONMENT: dev
-
 jobs:
-  deployment:
+  call-deployment-workflow:
+    runs-on: ubuntu-latest  # Define your runner for the matrix jobs
     strategy:
       matrix:
-        environment: [dev]
-        application: ["frontend", "backend", "cron"]  
-        namespace: ["appservices"]
+        namespace: [appservices]  # Multiple namespaces
+        environment: [dev]  # Different environments
+        application: [frontend, backend, cron]  # Multiple applications
     steps:
-      - uses: ./.github/workflows/deployment.yml
+      - name: Call deployment workflow
+        uses: ./.github/workflows/deployment.yml
         with:
           namespace: ${{ matrix.namespace }}
           environment: ${{ matrix.environment }}
           application: ${{ matrix.application }}
-          override_config: ""
+          override_config: ""  # Optional input
