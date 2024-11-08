@@ -11,7 +11,7 @@ env:
 
 jobs:
   deployment:
-    runs-on: self-hosted-on-demand
+    runs-on: self-hosted
     strategy:
       matrix:
         environment: [dev]
@@ -26,4 +26,3 @@ jobs:
           namespace: ${{ matrix.namespace }}
           environment: ${{ matrix.environment }}
           application: ${{ matrix.application }}
-  

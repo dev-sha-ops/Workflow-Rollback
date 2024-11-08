@@ -51,7 +51,7 @@ env:
   DEPLOY_KEY: "${{ inputs.application }}__${{ inputs.namespace }}.${{ inputs.environment }}"
 jobs:
   deployment:
-    runs-on: self-hosted-on-demand
+    runs-on: self-hosted
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -70,7 +70,7 @@ jobs:
           echo "helmfile --namespace ${{ env.NAMESPACE }} -e ${{ env.ENVIRONMENT }} sync --set MIGRATIONS=${{ toJSON(env.MIGRATIONS || false) }} --set NAMESPACE=${{ env.NAMESPACE }} --set DOCKER_IMAGE=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.APPLICATION }}.${{ env.NAMESPACE }}.${{ env.ENVIRONMENT }}"
 
   rollback:
-    runs-on: self-hosted-on-demand
+    runs-on: self-hosted
     needs: deployment
     if: failure()
     steps:
