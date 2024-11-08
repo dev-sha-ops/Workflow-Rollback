@@ -1,0 +1,82 @@
+name: deploy reusable workflow
+
+on:
+  workflow_call:
+    inputs:
+      namespace:
+        type: string
+        description: Namespace for deploy
+        required: true
+      environment:
+        type: string
+        description: Environment for deploy
+        required: true
+      application:
+        type: string
+        description: Application for deploy
+        required: true
+      override_config:
+        type: string
+        description: Override the instance build/deploy config
+  workflow_dispatch:
+    inputs:
+      namespace:
+        description: Namespaces for build
+        required: true
+        options:
+          - appservices
+        default: runner
+        type: choice
+      environment:
+        description: Environment for build
+        required: true
+        options:
+          - dev
+          - stg
+        default: dev
+        type: choice
+      application:
+        type: choice
+        description: Application for build
+        required: true
+        options:
+          - frontend
+          - backend
+          - cron
+        default: backend
+      override_config:
+        type: string
+        description: Override the instance build/deploy config
+env:
+  DEPLOY_KEY: "${{ inputs.application }}__${{ inputs.namespace }}.${{ inputs.environment }}"
+jobs:
+  deployment:
+    runs-on: self-hosted-on-demand
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Helm diff
+        run: |
+          echo "cd ${{ env.WORKING_DIRECTORY }}/${{ env.HELM_FILE_PATH }}"
+          echo "helmfile --namespace ${{ env.NAMESPACE }} -e ${{ env.ENVIRONMENT }} diff --set MIGRATIONS=${{ toJSON(env.MIGRATIONS || false) }} --set NAMESPACE=${{ env.NAMESPACE }} --set DOCKER_IMAGE=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.APPLICATION }}.${{ env.NAMESPACE }}.${{ env.ENVIRONMENT }}"
+      - name: Get current release version
+        run: |
+          echo "export PREVIOUS_VERSION=$(helm ls --namespace ${{ inputs.namespace }} -q | tail -n 1)"
+          echo "PREVIOUS_VERSION=${PREVIOUS_VERSION}" >> $GITHUB_ENV
+      - name: Helm install
+        continue-on-error: true
+        run: |
+          echo "cd ${{ env.WORKING_DIRECTORY }}/${{ env.HELM_FILE_PATH }}"
+          echo "helmfile --namespace ${{ env.NAMESPACE }} -e ${{ env.ENVIRONMENT }} sync --set MIGRATIONS=${{ toJSON(env.MIGRATIONS || false) }} --set NAMESPACE=${{ env.NAMESPACE }} --set DOCKER_IMAGE=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.APPLICATION }}.${{ env.NAMESPACE }}.${{ env.ENVIRONMENT }}"
+
+  rollback:
+    runs-on: self-hosted-on-demand
+    needs: deployment
+    if: failure()
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Rollback to previous release
+        run: |
+          echo "cd ${{ env.WORKING_DIRECTORY }}/${{ env.HELM_FILE_PATH }}"
+          echo "helmfile --namespace ${{ env.NAMESPACE }} -e ${{ env.ENVIRONMENT }} sync --set DOCKER_IMAGE=${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.PREVIOUS_VERSION }}"
