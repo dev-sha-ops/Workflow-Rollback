@@ -1,27 +1,15 @@
-name: Dev auto Deploy
+name: MP dev auto deploy
 
 on:
-  push:
-    branches:
-    - '*'
-
-env:
-  KUBECTL_VERSION: '1.22.13'
-  ENVIRONMENT: dev
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+  workflow_dispatch:
 
 jobs:
-  deployment:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        environment: [dev]
-        application: ["frontend", "backend", "cron"]  
-        namespace: ["appservices"]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4   
-      - uses: ./.github/workflows/deployment.yml
-        with:
-          namespace: ${{ matrix.namespace }}
-          environment: ${{ matrix.environment }}
-          application: ${{ matrix.application }}
+  call-deployment-workflow:
+    uses: ./.github/workflows/deployment.yml
+    with:
+      namespace: runner
+      environment: dev
+      application: backend
+      override_config: ""
