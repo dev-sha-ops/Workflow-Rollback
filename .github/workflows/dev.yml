@@ -16,9 +16,14 @@ jobs:
       matrix:
         environment: [dev]
         application: ["frontend", "backend", "cron"]  
-        namespace: ["appservices"]        
-    uses: ./.github/workflows/deployment.yml
-    with:
-      namespace: ${{ matrix.namespace }}
-      environment: ${{ matrix.environment }}
-      application: ${{ matrix.application }}
+        namespace: ["appservices"]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Deploy        
+        uses: ./.github/workflows/deployment.yml
+        with:
+          namespace: ${{ matrix.namespace }}
+          environment: ${{ matrix.environment }}
+          application: ${{ matrix.application }}
+  
