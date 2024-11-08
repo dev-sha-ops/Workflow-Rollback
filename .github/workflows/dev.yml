@@ -1,9 +1,9 @@
-name: MP dev auto deploy
+name: Dev auto Deploy
 
 on:
   push:
     branches:
-      - main
+    - '*'
 
 env:
   KUBECTL_VERSION: '1.22.13'
@@ -15,8 +15,8 @@ jobs:
     strategy:
       matrix:
         environment: [dev]
-        application: ["frontend", "backend", "cron"]
-        namespace: ["appservices"] 
+        application: ["frontend", "backend", "cron"]  
+        namespace: ["appservices"]        
     uses: ./.github/workflows/deployment.yml
     with:
       namespace: ${{ matrix.namespace }}
