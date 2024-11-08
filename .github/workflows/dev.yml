@@ -4,6 +4,11 @@ on:
   pull_request:
     types: [opened, synchronize, reopened, labeled]
   workflow_dispatch:
+
+env:
+  KUBECTL_VERSION: '1.22.13'
+  ENVIRONMENT: dev
+
 jobs:
   deployment:
     strategy:
@@ -12,9 +17,9 @@ jobs:
         application: ["frontend", "backend", "cron"]  
         namespace: ["appservices"]
     steps:
-    - uses: ./.github/workflows/deployment.yml
-      with:
-        namespace: runner
-        environment: dev
-        application: backend
-        override_config: ""
+      - uses: ./.github/workflows/deployment.yml
+        with:
+          namespace: ${{ matrix.namespace }}
+          environment: ${{ matrix.environment }}
+          application: ${{ matrix.application }}
+          override_config: ""
