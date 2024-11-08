@@ -86,7 +86,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
       - name: Rollback to previous release
         run: |
           echo "cd ${{ env.WORKING_DIRECTORY }}/${{ env.HELM_FILE_PATH }}"

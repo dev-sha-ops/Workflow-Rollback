@@ -18,8 +18,6 @@ jobs:
         application: ["frontend", "backend", "cron"]  
         namespace: ["appservices"]
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
       - name: Deploy        
         uses: ./.github/workflows/deployment.yml
         with:
