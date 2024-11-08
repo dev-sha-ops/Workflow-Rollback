@@ -12,7 +12,7 @@ jobs:
         application: ["frontend", "backend", "cron"]  
         namespace: ["appservices"]
     steps:
-      uses: ./.github/workflows/deployment.yml
+    - uses: ./.github/workflows/deployment.yml
       with:
         namespace: runner
         environment: dev
