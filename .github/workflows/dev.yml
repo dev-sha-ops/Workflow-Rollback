@@ -1,3 +1,4 @@
+# .github/workflows/dev.yml
 name: MP dev auto deploy
 
 on:
@@ -7,9 +8,16 @@ on:
 
 jobs:
   call-deployment-workflow:
-    uses: ./.github/workflows/deployment.yml
-    with:
-      namespace: runner
-      environment: dev
-      application: backend
-      override_config: ""
+    runs-on: ubuntu-latest  # Define your runner for the matrix jobs
+    strategy:
+      matrix:
+        namespace: [appservices]  # Multiple namespaces
+        environment: [dev]  # Different environments
+        application: [frontend, backend, cron]  # Multiple applications
+    steps:
+      uses: ./.github/workflows/deployment.yml
+      with:
+        namespace: ${{ matrix.namespace }}
+        environment: ${{ matrix.environment }}
+        application: ${{ matrix.application }}
+        override_config: ""  # Optional input
